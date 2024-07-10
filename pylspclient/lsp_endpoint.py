@@ -30,6 +30,8 @@ class LspEndpoint(threading.Thread):
         self._timeout: int = timeout
         self.shutdown_flag: bool = False
 
+        self.notify_callbacks['window/logMessage'] = self.handle_log_message
+        self.notify_callbacks['window/showMessage'] = self.handle_show_message
 
     def handle_result(self, rpc_id: Union[str, int], result: ResultType, error: ErrorType):
         self.response_dict[rpc_id] = (result, error)
@@ -38,10 +40,14 @@ class LspEndpoint(threading.Thread):
         cond.notify()
         cond.release()
 
-
     def stop(self) -> None:
         self.shutdown_flag = True
 
+    def handle_log_message(self, message: str):
+        print(f"log msg: {message}")
+
+    def handle_show_message(self, message: str):
+        print(f"show msg: {message}")
 
     def run(self) -> None:
         while not self.shutdown_flag:
@@ -95,7 +101,6 @@ class LspEndpoint(threading.Thread):
         message_dict["method"] = method_name
         message_dict["params"] = params
         self.json_rpc_endpoint.send_request(message_dict)
-
 
     def call_method(self, method_name: str, **kwargs) -> Any:
         current_id = self.next_id
