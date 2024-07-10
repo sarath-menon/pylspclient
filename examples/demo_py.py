@@ -26,9 +26,11 @@ class ReadPipe(threading.Thread):
             line = self.pipe.readline().decode('utf-8')
 
 def server_process() -> subprocess.Popen:
-    #pylsp_cmd = ["python", "-m", "pylsp"]
     pylsp_cmd = ["pyright-langserver", "--stdio"]
-    # pylsp_cmd = ["ruff", "server", "--preview"]
+
+    #pylsp_cmd = ["python", "-m", "pylsp"]
+    #pylsp_cmd = ["ruff", "server", "--preview"]
+    #pylsp_cmd = ["pylyzer", "--server"]
     p = subprocess.Popen(pylsp_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p
 

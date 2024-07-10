@@ -34,6 +34,12 @@ Pylsp
 python -m pylsp
 ```
 
+Pylyzer
+
+```
+pylyzer --server
+```
+
 ## Typescript
 
 Typescript-language-server
