@@ -79,15 +79,66 @@ def get_document_symbols(file_path: str, lsp_client: pylspclient.LspClient):
     symbols = lsp_client.documentSymbol(TextDocumentIdentifier(uri=uri))
     return symbols
 
+
+def add_file(lsp_client: pylspclient.LspClient, relative_file_path: str):
+    uri = to_uri(relative_file_path)
+    text = open(relative_file_path, "r").read()
+    languageId = LanguageIdentifier.PYTHON
+    version = 1
+    # First need to open the file, and then iterate over the docuemnt's symbols
+    lsp_client.didOpen(TextDocumentItem(uri=uri, languageId=languageId, version=version, text=text))
+
+def add_dir(lsp_client: pylspclient.LspClient, root: str):
+    for filename in listdir(root):
+        if filename.endswith(".py"):
+            add_file(lsp_client, path.join(root, filename))
+
+def string_in_text_to_position(text: str, string: str) -> Optional[Position]:
+    for i, line in enumerate(text.splitlines()):
+        char = line.find(string)
+        if char != -1:
+            return Position(line=i, character=char)
+    return None
+
+def range_in_text_to_string(text: str, range_: Range) -> Optional[str]:
+    lines = text.splitlines()
+    if range_.start.line == range_.end.line:
+        # Same line
+        return lines[range_.start.line][range_.start.character:range_.end.character]
+    raise NotImplementedError
+
+def get_function_definition(lsp_client: pylspclient.LspClient):
+    add_dir(lsp_client, DEFAULT_ROOT)
+    file_path = "lsp_client.py"
+    relative_file_path = path.join(DEFAULT_ROOT, file_path)
+    uri = to_uri(relative_file_path)
+    file_content = open(relative_file_path, "r").read()
+
+    position = string_in_text_to_position(file_content, "shutdown")
+    print(f"position: {position}")
+    
+    definitions = lsp_client.definition(TextDocumentIdentifier(uri=uri), position)
+    print(f"definitions: {definitions}")
+
+    # result_path = from_uri(definitions[0].uri)
+    # result_file_content = open(result_path, "r").read()
+    # result_definition = range_in_text_to_string(result_file_content, definitions[0].range)
+
 def main():
     p = server_process()
     try:
         rpc = json_rpc(p)
         client = initialize_lsp(rpc)
         print("Initialization successful.")
-        symbols = get_document_symbols("lsp_client.py", client)
-        for symbol in symbols:
-            print(f"Name: {symbol.name},  Kind: {SymbolKind(symbol.kind).name}")
+
+        # # get symbols in file
+        # symbols = get_document_symbols("lsp_client.py", client)
+        # for symbol in symbols:
+        #     print(f"Name: {symbol.name},  Kind: {SymbolKind(symbol.kind).name}")
+
+        # get definition
+        get_function_definition(client)
+
     finally:
         p.kill()
         p.communicate()
