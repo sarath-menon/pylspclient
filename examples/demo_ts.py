@@ -47,8 +47,16 @@ def json_rpc(server_process: subprocess.Popen) -> pylspclient.JsonRpcEndpoint:
     json_rpc_endpoint = pylspclient.JsonRpcEndpoint(server_process.stdin, server_process.stdout)
     return json_rpc_endpoint
 
+# Add this method to your LspEndpoint class
+def handle_typescript_version(params):
+    print(f"typescriptVersion: {params}")
+
 def initialize_lsp(json_rpc: pylspclient.JsonRpcEndpoint) -> pylspclient.LspClient:
-    lsp_endpoint = pylspclient.LspEndpoint(json_rpc)
+    notify_callbacks = {
+        "$/typescriptVersion": handle_typescript_version
+    }
+
+    lsp_endpoint = pylspclient.LspEndpoint(json_rpc, notify_callbacks=notify_callbacks)
     lsp_client = pylspclient.LspClient(lsp_endpoint)
     process_id = None
     root_path = None
