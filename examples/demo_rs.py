@@ -26,7 +26,7 @@ class ReadPipe(threading.Thread):
             line = self.pipe.readline().decode('utf-8')
 
 def server_process() -> subprocess.Popen:
-    lsp_cmd = ["typescript-language-server", "--stdio"]
+    lsp_cmd = ["rust-analyzer"]
     p = subprocess.Popen(lsp_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p
 
