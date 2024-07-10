@@ -32,6 +32,10 @@ class LspEndpoint(threading.Thread):
 
         self.notify_callbacks['window/logMessage'] = self.handle_log_message
         self.notify_callbacks['window/showMessage'] = self.handle_show_message
+        self.notify_callbacks['textDocument/publishDiagnostics'] = self.handle_publish_diagnostics
+
+    def handle_publish_diagnostics(self, params: dict):
+        print(f"publish diagnostics: {params}")
 
     def handle_result(self, rpc_id: Union[str, int], result: ResultType, error: ErrorType):
         self.response_dict[rpc_id] = (result, error)
