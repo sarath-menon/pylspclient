@@ -27,6 +27,8 @@ class ReadPipe(threading.Thread):
 
 def server_process() -> subprocess.Popen:
     pylsp_cmd = ["python", "-m", "pylsp"]
+    #pylsp_cmd = ["pyright-langserver", "--stdio"]
+    # pylsp_cmd = ["ruff", "server", "--preview"]
     p = subprocess.Popen(pylsp_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p
 
@@ -60,8 +62,8 @@ def initialize_lsp(json_rpc: pylspclient.JsonRpcEndpoint) -> pylspclient.LspClie
 
     initialize_response = lsp_client.initialize(process_id, root_path, root_uri, initialization_options, capabilities, trace, workspace_folders)
 
-    if initialize_response['serverInfo']['name'] != 'pylsp':
-        raise RuntimeError("failed to initialize lsp_client")
+    # if initialize_response['serverInfo']['name'] != 'pylsp':
+    #     raise RuntimeError("failed to initialize lsp_client")
     lsp_client.initialized()
     return lsp_client
 
