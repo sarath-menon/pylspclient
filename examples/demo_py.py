@@ -1,3 +1,4 @@
+#%%
 from typing import Optional
 from os import path, listdir
 import subprocess
@@ -6,6 +7,7 @@ import threading
 import pylspclient
 from pylspclient.lsp_pydantic_strcuts import TextDocumentIdentifier, TextDocumentItem, LanguageIdentifier, Position, Range, SymbolKind, CompletionTriggerKind, CompletionContext
 
+#%%
 def to_uri(path: str) -> str:
     if path.startswith("uri://"):
         return path
@@ -45,7 +47,7 @@ DEFAULT_CAPABILITIES = {
         }
     }
 }
-DEFAULT_ROOT = path.abspath("./examples/example-files/python/")
+DEFAULT_ROOT = path.abspath("../examples/example-files/python/")
 
 def json_rpc(server_process: subprocess.Popen) -> pylspclient.JsonRpcEndpoint:
     json_rpc_endpoint = pylspclient.JsonRpcEndpoint(server_process.stdin, server_process.stdout)
@@ -107,14 +109,13 @@ def range_in_text_to_string(text: str, range_: Range) -> Optional[str]:
         return lines[range_.start.line][range_.start.character:range_.end.character]
     raise NotImplementedError
 
-def get_function_definition(lsp_client: pylspclient.LspClient):
+def get_function_definition(lsp_client: pylspclient.LspClient, file_path: str, function_name: str):
     add_dir(lsp_client, DEFAULT_ROOT)
-    file_path = "lsp_client.py"
     relative_file_path = path.join(DEFAULT_ROOT, file_path)
     uri = to_uri(relative_file_path)
     file_content = open(relative_file_path, "r").read()
 
-    position = string_in_text_to_position(file_content, "shutdown")
+    position = string_in_text_to_position(file_content, function_name)
     print(f"position: {position}")
     
     definitions = lsp_client.definition(TextDocumentIdentifier(uri=uri), position)
@@ -124,24 +125,30 @@ def get_function_definition(lsp_client: pylspclient.LspClient):
     # result_file_content = open(result_path, "r").read()
     # result_definition = range_in_text_to_string(result_file_content, definitions[0].range)
 
-def main():
-    p = server_process()
-    try:
-        rpc = json_rpc(p)
-        client = initialize_lsp(rpc)
-        print("Initialization successful.")
+#%% # get symbols in file
 
-        # # get symbols in file
-        # symbols = get_document_symbols("lsp_client.py", client)
-        # for symbol in symbols:
-        #     print(f"Name: {symbol.name},  Kind: {SymbolKind(symbol.kind).name}")
+p = server_process()    
+rpc = json_rpc(p)
+client = initialize_lsp(rpc)
 
-        # get definition
-        get_function_definition(client)
+file_path = "lsp_client.py"
+symbols = get_document_symbols("lsp_client.py", client)
 
-    finally:
-        p.kill()
-        p.communicate()
+for symbol in symbols:
+    print(f"Name: {symbol.name},  Kind: {SymbolKind(symbol.kind).name}")
 
-if __name__ == "__main__":
-    main()
+p.kill()
+p.communicate()
+#%% # get definition
+
+p = server_process()    
+rpc = json_rpc(p)
+client = initialize_lsp(rpc)
+print("Initialization successful.")
+
+file_path = "lsp_client.py"
+function_name = "shutdown"
+get_function_definition(client, file_path, function_name)
+
+p.kill()
+p.communicate()
