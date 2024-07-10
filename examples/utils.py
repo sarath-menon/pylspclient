@@ -5,10 +5,12 @@ from pylspclient.lsp_pydantic_strcuts import TextDocumentItem, LanguageIdentifie
 from os import listdir, path
 from typing import Optional
 
-def to_uri(path: str) -> str:
-    if path.startswith("uri://"):
-        return path
-    return f"uri://{path}"
+def to_uri(path: str, uri_scheme: str = "plain") -> str:
+    if uri_scheme == "file":
+        return f"file://{path}"
+
+    elif uri_scheme == "plain":
+        return f"uri://{path}"
 
 def from_uri(path: str) -> str:
     return path.replace("uri://", "").replace("uri:", "")
