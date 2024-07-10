@@ -2,30 +2,12 @@
 from typing import Optional
 from os import path, listdir
 import subprocess
-import threading
 
 import pylspclient
 from pylspclient.lsp_pydantic_strcuts import TextDocumentIdentifier, TextDocumentItem, LanguageIdentifier, Position, Range, SymbolKind, CompletionTriggerKind, CompletionContext
+from utils import to_uri, from_uri, add_file, add_dir, string_in_text_to_position, range_in_text_to_string
 
 #%%
-def to_uri(path: str) -> str:
-    if path.startswith("uri://"):
-        return path
-    return f"uri://{path}"
-
-def from_uri(path: str) -> str:
-    return path.replace("uri://", "").replace("uri:", "")
-
-class ReadPipe(threading.Thread):
-    def __init__(self, pipe):
-        threading.Thread.__init__(self)
-        self.pipe = pipe
-
-    def run(self):
-        line = self.pipe.readline().decode('utf-8')
-        while line:
-            print(line)
-            line = self.pipe.readline().decode('utf-8')
 
 def server_process() -> subprocess.Popen:
     pylsp_cmd = ["pyright-langserver", "--stdio"]
@@ -82,32 +64,7 @@ def get_document_symbols(file_path: str, lsp_client: pylspclient.LspClient):
     return symbols
 
 
-def add_file(lsp_client: pylspclient.LspClient, relative_file_path: str):
-    uri = to_uri(relative_file_path)
-    text = open(relative_file_path, "r").read()
-    languageId = LanguageIdentifier.PYTHON
-    version = 1
-    # First need to open the file, and then iterate over the docuemnt's symbols
-    lsp_client.didOpen(TextDocumentItem(uri=uri, languageId=languageId, version=version, text=text))
 
-def add_dir(lsp_client: pylspclient.LspClient, root: str):
-    for filename in listdir(root):
-        if filename.endswith(".py"):
-            add_file(lsp_client, path.join(root, filename))
-
-def string_in_text_to_position(text: str, string: str) -> Optional[Position]:
-    for i, line in enumerate(text.splitlines()):
-        char = line.find(string)
-        if char != -1:
-            return Position(line=i, character=char)
-    return None
-
-def range_in_text_to_string(text: str, range_: Range) -> Optional[str]:
-    lines = text.splitlines()
-    if range_.start.line == range_.end.line:
-        # Same line
-        return lines[range_.start.line][range_.start.character:range_.end.character]
-    raise NotImplementedError
 
 def get_function_definition(lsp_client: pylspclient.LspClient, file_path: str, function_name: str):
     add_dir(lsp_client, DEFAULT_ROOT)
