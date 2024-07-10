@@ -53,5 +53,5 @@ typescript-language-server --stdio
 Rust-analyzer
 
 ```
-rust-analyzer --server
+rust-analyzer
 ```
