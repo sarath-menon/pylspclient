@@ -47,3 +47,11 @@ Typescript-language-server
 ```
 typescript-language-server --stdio
 ```
+
+## Rust
+
+Rust-analyzer
+
+```
+rust-analyzer --server
+```
