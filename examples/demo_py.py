@@ -26,8 +26,8 @@ class ReadPipe(threading.Thread):
             line = self.pipe.readline().decode('utf-8')
 
 def server_process() -> subprocess.Popen:
-    pylsp_cmd = ["python", "-m", "pylsp"]
-    #pylsp_cmd = ["pyright-langserver", "--stdio"]
+    #pylsp_cmd = ["python", "-m", "pylsp"]
+    pylsp_cmd = ["pyright-langserver", "--stdio"]
     # pylsp_cmd = ["ruff", "server", "--preview"]
     p = subprocess.Popen(pylsp_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p
@@ -43,7 +43,7 @@ DEFAULT_CAPABILITIES = {
         }
     }
 }
-DEFAULT_ROOT = path.abspath("./examples/example-files/")
+DEFAULT_ROOT = path.abspath("./examples/example-files/python/")
 
 def json_rpc(server_process: subprocess.Popen) -> pylspclient.JsonRpcEndpoint:
     json_rpc_endpoint = pylspclient.JsonRpcEndpoint(server_process.stdin, server_process.stdout)
