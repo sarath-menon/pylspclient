@@ -1,42 +1,43 @@
-# pylspclient
-[![image](https://img.shields.io/pypi/v/pylspclient.svg)](https://pypi.org/project/pylspclient/)
-[![Test Package](https://github.com/yeger00/pylspclient/actions/workflows/test-pkg.yml/badge.svg)](https://github.com/yeger00/pylspclient/actions/workflows/test-pkg.yml)
-[![image](https://img.shields.io/github/license/python-ls/python-ls.svg)](https://github.com/yeger00/pylspclient/blob/main/LICENSE)
-[![image](https://blanket-d37ae43238cc.herokuapp.com/badge?repo_name=yeger00/pylspclient)](https://blanket-d37ae43238cc.herokuapp.com/?repo_name=yeger00/pylspclient)
+# Usage
 
-A Python 3.10+ implementation of a [LSP](https://microsoft.github.io/language-server-protocol/) client.
+## Python
 
-
-# What is LSP?
-
-
-# Getting started
-## Installation
 ```
-pip install pylspclient
+python examples/demo_py.py
 ```
 
-# Contributing
-In order to contribute you need to make sure your PR passes all the [Test Package](https://github.com/yeger00/pylspclient/blob/main/.github/workflows/test-pkg.yml) steps.
-All the development related commands are wrap with Makefile just for easy access from both the development environment and from the workflows. You can see that most of the commands are only 1 line and you can run them directly.
-You can run it locally as well:
+## Typescript
 
-## Run the tests
 ```
-make test
+python examples/demo_ts.py
 ```
 
-## Run the linter
+# Running lanfguage servers
+
+## Python
+
+Pyright
+
 ```
-make lint
+pyright-langserver --stdio
 ```
 
-## New release
+Ruff
+
 ```
-make bump
-make build
-make publish
+ruff server --preview
 ```
 
-# License
-This project is made available under the MIT License.
+Pylsp
+
+```
+python -m pylsp
+```
+
+## Typescript
+
+Typescript-language-server
+
+```
+typescript-language-server --stdio
+```
