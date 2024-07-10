@@ -92,6 +92,7 @@ def test_initialize(json_rpc: pylspclient.JsonRpcEndpoint):
     initialize_response = lsp_client.initialize(process_id, root_path, root_uri, initialization_options, capabilities, trace, workspace_folders)
     lsp_client.initialized()
     assert initialize_response['serverInfo']['name'] == 'pylsp'
+    print(initialize_response)
     lsp_client.shutdown()
     lsp_client.exit()
 
